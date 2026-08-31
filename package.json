@@ -1,0 +1,16 @@
+{
+  "name": "kngl-breaking-news-widget",
+  "version": "1.0.0",
+  "description": "Kick ve OBS için dinamik Son Dakika Haber Bandı ve Streamer Kontrol Paneli",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "ws": "^8.18.0"
+  },
+  "author": "KNGL Live",
+  "license": "MIT"
+}

@@ -1,0 +1,106 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KNGL OBS Son Dakika Haber Bandı (Yayın Ekranı)</title>
+  <link rel="stylesheet" href="overlay.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@600;700;800&family=Inter:wght@600;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Firebase Compat SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body class="theme-red">
+  <!-- Full Screen Transparent OBS Canvas -->
+  <div id="overlay-root" class="overlay-root">
+    
+    <!-- Flash Burst Effect -->
+    <div id="flash-effect" class="flash-effect"></div>
+
+    <!-- The Breaking News Lower-Third Bar Wrapper -->
+    <div id="news-bar-wrapper" class="news-bar-wrapper">
+      
+      <!-- Top Decorative Scanning Light Beam -->
+      <div class="top-light-beam"></div>
+
+      <!-- Upper Sub-Header Stripe (Category & Live Clock) -->
+      <div class="upper-header-bar">
+        <div class="upper-left-indent">
+          <div class="live-indicator">
+            <span class="live-dot"></span>
+            <span class="live-tag">CANLI</span>
+          </div>
+          <div id="category-badge" class="category-badge">
+            <span id="category-text">KNGL HABER MERKEZİ</span>
+          </div>
+        </div>
+
+        <div class="upper-right-items">
+          <div class="kick-tag">
+            <svg class="kick-icon" viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+              <path d="M4 3h5v5h3V3h5v6h-3v2h3v2h-3v2h3v6h-5v-5h-3v5H4V3z"/>
+            </svg>
+            <span>KICK.COM</span>
+          </div>
+          <div id="live-clock-badge" class="live-clock-badge">
+            <span id="clock-display">00:00:00</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main News Lower-Third Body -->
+      <div class="news-main-body">
+        
+        <!-- Left Emblem Box: User's Reference Kangal Logo (image_3bb46a.png) in Root Directory -->
+        <div class="emblem-container" id="emblem-container">
+          <div class="emblem-shield-halo"></div>
+          <div class="emblem-rotating-ring"></div>
+          <div class="emblem-img-wrapper" id="emblem-img-wrapper">
+            <img id="kangal-emblem" src="image_3bb46a.png" alt="KNGL Kangal Logo" class="emblem-img">
+          </div>
+          <div class="emblem-flare-burst"></div>
+        </div>
+
+        <!-- Flashing Breaking News Badge (SON DAKİKA) -->
+        <div class="breaking-badge-section" id="breaking-badge-section">
+          <div class="badge-bg-skew">
+            <div class="badge-glow-sweep"></div>
+            <span id="breaking-badge-text" class="breaking-badge-text">SON DAKİKA</span>
+          </div>
+          <div class="badge-arrow-separator"></div>
+        </div>
+
+        <!-- Dynamic Scrolling Ticker Track -->
+        <div class="ticker-viewport" id="ticker-viewport">
+          <div class="ticker-track" id="ticker-track">
+            <div class="ticker-content" id="ticker-content">
+              <span class="ticker-item">KICK YAYININA HOŞ GELDİNİZ!</span>
+            </div>
+          </div>
+          <!-- Left and Right fade gradients -->
+          <div class="ticker-fade fade-left"></div>
+          <div class="ticker-fade fade-right"></div>
+        </div>
+
+        <!-- Right End Equalizer / Tech Cap -->
+        <div class="right-tech-cap">
+          <div class="equalizer-bars">
+            <span></span><span></span><span></span><span></span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Bottom Neon Glowing Border Line -->
+      <div class="bottom-neon-line"></div>
+    </div>
+
+  </div>
+
+  <script src="overlay.js"></script>
+</body>
+</html>

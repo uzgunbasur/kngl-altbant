@@ -1,0 +1,340 @@
+﻿<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>KNGL Live - Giriş & Kontrol Paneli</title>
+  <link rel="stylesheet" href="admin.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Teko:wght@600;700&family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <!-- Firebase Compat SDKs (App, Auth, Database) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+  <script src="firebase-config.js"></script>
+</head>
+<body>
+  
+  <!-- ====================================================================
+       🔒 1. FIREBASE AUTHENTICATION LOGIN SCREEN (DEFAULT VISIBLE)
+       ==================================================================== -->
+  <div id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      
+      <!-- Kangal Logo with Cyber Halo -->
+      <div class="auth-logo-frame">
+        <div class="auth-shield-halo"></div>
+        <img src="image_3bb46a.png" alt="KNGL Kangal Logo" class="auth-logo-img">
+      </div>
+
+      <div class="auth-title-block">
+        <h2 class="auth-title">KNGL <span class="brand-highlight">KONTROL</span> GİRİŞİ</h2>
+        <p class="auth-subtitle">Yayın Masasını Yönetmek İçin Giriş Yapın</p>
+      </div>
+
+      <!-- Auth Error Notification Alert -->
+      <div id="auth-error" class="auth-error-box" style="display: none;"></div>
+
+      <!-- Login Form (Username + Password) -->
+      <form id="login-form" class="auth-form" onsubmit="return false;">
+        
+        <div class="form-group">
+          <label for="auth-username">Kullanıcı Adı</label>
+          <input type="text" id="auth-username" class="form-control auth-input" placeholder="uzgunbasur" required autocomplete="username" autocapitalize="none" spellcheck="false">
+        </div>
+
+        <div class="form-group">
+          <label for="auth-password">Şifre</label>
+          <input type="password" id="auth-password" class="form-control auth-input" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+
+        <button type="submit" id="btn-login" class="btn btn-primary btn-login-submit">
+          <span id="login-btn-text">GİRİŞ YAP 🚀</span>
+          <span id="login-spinner" class="login-spinner" style="display: none;"></span>
+        </button>
+
+      </form>
+
+      <div class="auth-footer">
+        <span>🔒 Firebase Authentication 7/24 Güvenli Bağlantı</span>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ====================================================================
+       🎮 2. MAIN STREAMER CONTROL PANEL (COMPLETELY HIDDEN UNTIL LOGGED IN)
+       ==================================================================== -->
+  <div id="app-container" class="app-container" style="display: none;">
+    
+    <!-- Top Nav Header -->
+    <header class="app-header">
+      <div class="header-brand">
+        <div class="brand-logo-frame">
+          <img src="image_3bb46a.png" alt="KNGL Logo" class="brand-logo">
+        </div>
+        <div class="brand-info">
+          <h1>KNGL <span class="brand-highlight">SON DAKİKA</span> KONTROL</h1>
+          <p class="brand-subtitle">Kick & OBS 7/24 Bulut Tabanlı Yayın Masası</p>
+        </div>
+      </div>
+
+      <div class="header-right-actions">
+        <!-- Logged-in User Badge -->
+        <div class="user-pill" id="user-pill" title="Giriş Yapan Kullanıcı">
+          <span class="user-icon">👤</span>
+          <span id="user-email-display">admin</span>
+        </div>
+
+        <!-- Firebase Status Badge -->
+        <div class="firebase-status-pill" id="firebase-status-pill">
+          <span class="status-dot" id="status-dot"></span>
+          <span id="firebase-status-text">Firebase: Bağlı</span>
+        </div>
+
+        <!-- Logout Button -->
+        <button class="btn btn-logout" id="btn-logout" title="Oturumu Kapat">
+          🚪 Çıkış
+        </button>
+      </div>
+    </header>
+
+    <!-- PROMINENT OBS LINK CARD -->
+    <div class="links-dashboard">
+      <div class="link-card obs-link-card">
+        <div class="link-card-header">
+          <span class="link-badge obs-badge">📺 YAYINCININ OBS'E EKLEYECEĞİ ŞEFFAF LİNK</span>
+          <span class="link-desc">Bu URL'yi kopyalayıp OBS'e "Tarayıcı Kaynağı" (1920x1080) olarak ekleyin:</span>
+        </div>
+        <div class="link-input-group">
+          <input type="text" id="inp-obs-url" class="link-url-input" readonly value="">
+          <button class="btn btn-copy" id="btn-copy-obs" title="OBS Linkini Kopyala">
+            <span id="copy-btn-label">Kopyala 📋</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN INTERACTIVE DECK -->
+    <main class="main-grid">
+
+      <!-- LEFT PANEL: Instant Show / Hide Actions & Preview -->
+      <section class="left-panel">
+        
+        <!-- YAYINA SOK / ÇIKAR (SHOW / HIDE) CARD -->
+        <div class="card visibility-action-card">
+          <div class="card-header">
+            <div class="card-title">
+              <span class="pulse-indicator"></span>
+              YAYIN KONTROLÜ (GÖSTER / GİZLE)
+            </div>
+            <div id="live-state-tag" class="state-tag state-visible">
+              🟢 ŞU AN YAYINDA
+            </div>
+          </div>
+
+          <p class="section-intro">Butona bastığınız anda OBS'teki bant animasyonla girer veya çıkar:</p>
+
+          <div class="show-hide-buttons-grid">
+            <button type="button" class="btn btn-show" id="btn-show-banner">
+              <span class="btn-big-icon">🟢</span>
+              <div class="btn-text-wrap">
+                <span class="btn-title">BANDI GÖSTER</span>
+                <span class="btn-sub">Yayına Sok (Animasyonlu)</span>
+              </div>
+            </button>
+
+            <button type="button" class="btn btn-hide" id="btn-hide-banner">
+              <span class="btn-big-icon">🔴</span>
+              <div class="btn-text-wrap">
+                <span class="btn-title">BANDI GİZLE</span>
+                <span class="btn-sub">Yayından Çıkar (Animasyonlu)</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
+        <!-- Live OBS Simulator -->
+        <div class="card preview-card">
+          <div class="card-header">
+            <div class="card-title">👁️ CANLI OBS SİMÜLATÖRÜ</div>
+            <button class="btn btn-xs btn-outline" id="btn-refresh-preview">🔄 Yenile</button>
+          </div>
+          <div class="preview-stage-container">
+            <iframe id="preview-frame" src="overlay.html" title="OBS Canlı Yayın Önizlemesi"></iframe>
+          </div>
+          <div class="preview-footer-note">
+            Yayıncının OBS ekranında ne görünüyorsa burada anlık olarak canlı akar.
+          </div>
+        </div>
+
+        <!-- Quick Presets -->
+        <div class="card presets-card">
+          <div class="card-header">
+            <div class="card-title">⚡ HIZLI ŞABLONLAR & PRESETLER</div>
+          </div>
+          <div class="preset-grid">
+            <button class="preset-btn" data-badge="YAYIN BAŞLADI" data-cat="KNGL CANLI" data-news="YAYINIMIZA HOŞ GELDİNİZ! ++ SOHBETE KATILIN, TAKİP ETMEYİ UNUTMAYIN! ++ GÜNÜN PROGRAMI VE SÜRPRİZLER BİRAZDAN CANLI YAYINDA!">
+              🎮 Yayın Başlangıcı
+            </button>
+            <button class="preset-btn" data-badge="KICK HEDEFİ" data-cat="TAKİP & ABONE" data-news="YENİ KICK TAKİPÇİ HEDEFİ: 500 / 1000 ++ ABONE OLARAK VE HOST ATARAK DESTEK VEREBİLİRSİNİZ! ++ HEPİNİZE TEŞEKKÜRLER!">
+              🎯 Takipçi Hedefi
+            </button>
+            <button class="preset-btn" data-badge="ÖNEMLİ DUYURU" data-cat="FLAŞ GELİŞME" data-news="BU AKŞAM 22:00'DA DEV ÇEKİLİŞ VAR! ++ YAYINDA KALAN İZLEYİCİLER ARASINDAN ÖZEL ÖDÜLLER VERİLECEK! ++ CHAT'E KATILIN!">
+              🎁 Çekiliş & Ödül
+            </button>
+            <button class="preset-btn" data-badge="KISA BİR MOLA" data-cat="BRB / AFK" data-news="YAYINIMIZ KISA BİR SÜRE İÇİN MOLADA ++ KAHVENİZİ ALIN, BİRAZDAN GERİ DÖNÜYORUZ! ++ AYRILMAYIN!">
+              ☕ Mola / BRB
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- RIGHT PANEL: Text Input & Update Button & Customization -->
+      <section class="right-panel">
+        
+        <!-- MAIN TEXT BOX & UPDATE BUTTON CARD -->
+        <div class="card form-card">
+          <div class="card-header">
+            <div class="card-title">✍️ HABER METNİ & ANLIK GÜNCELLEME</div>
+          </div>
+
+          <form id="news-form" onsubmit="return false;">
+            
+            <!-- News Ticker Text Input Area -->
+            <div class="form-group">
+              <div class="label-with-action">
+                <label for="txt-ticker">
+                  <span class="label-bold">Haber / Duyuru Metni (Akan Yazı)</span>
+                </label>
+                <button type="button" class="btn btn-xs btn-outline" id="btn-add-separator" title="Haberler arasına '++' ayracı ekler">
+                  ➕ "++" Ayracı Ekle
+                </button>
+              </div>
+              <textarea id="txt-ticker" class="form-control textarea-news" rows="4" placeholder="Kendi haber metninizi buraya yazın..."></textarea>
+              <div class="form-hint">İpucu: Farklı cümleler arasına <code>++</code> koyarak haber bandında sırayla akmasını sağlayabilirsiniz.</div>
+            </div>
+
+            <!-- PROMINENT GÜNCELLE (UPDATE) BUTTON -->
+            <div class="update-action-wrap">
+              <button type="button" class="btn btn-primary btn-update-large" id="btn-publish">
+                <span class="btn-icon">⚡</span>
+                <div class="btn-text-block">
+                  <span class="main-text">YAYINDAKİ METNİ GÜNCELLE</span>
+                  <span class="shortcut-text">(OBS anında güncellenir / Kısayol: Ctrl+Enter)</span>
+                </div>
+              </button>
+
+              <button type="button" class="btn btn-alert" id="btn-trigger-sound" title="OBS'te uyarı sesi ve ışık flaşı patlatır">
+                <span class="btn-icon">🚨</span>
+                <span>Flaş Uyarı</span>
+              </button>
+            </div>
+
+            <hr class="form-divider">
+
+            <!-- Title & Category Adjusters -->
+            <div class="form-row">
+              <div class="form-group flex-1">
+                <label for="inp-badge">
+                  <span>Yanıp Sönen Ana Başlık:</span>
+                </label>
+                <input type="text" id="inp-badge" class="form-control font-bold" placeholder="Örn: SON DAKİKA" value="SON DAKİKA" maxlength="25">
+              </div>
+
+              <div class="form-group flex-1">
+                <label for="inp-category">
+                  <span>Üst Başlık / Kategori:</span>
+                </label>
+                <input type="text" id="inp-category" class="form-control" placeholder="Örn: KNGL HABER MERKEZİ" value="KNGL HABER MERKEZİ" maxlength="40">
+              </div>
+            </div>
+
+          </form>
+        </div>
+
+        <!-- Customization Settings -->
+        <div class="card settings-card">
+          <div class="card-header">
+            <div class="card-title">⚙️ HIZ VE RENK AYARLARI</div>
+          </div>
+
+          <div class="settings-grid">
+            
+            <!-- Speed Control -->
+            <div class="setting-item">
+              <div class="setting-label-row">
+                <span>⚡ Kayan Yazı Hızı:</span>
+                <span id="speed-val" class="badge-value">60 px/s</span>
+              </div>
+              <input type="range" id="rng-speed" min="20" max="130" value="60" class="range-slider">
+              <div class="range-marks">
+                <span>Yavaş</span>
+                <span>Normal</span>
+                <span>Hızlı</span>
+                <span>Roket</span>
+              </div>
+            </div>
+
+            <!-- Theme Selector -->
+            <div class="setting-item">
+              <span class="setting-label">🎨 Renk Teması:</span>
+              <div class="theme-picker-group">
+                <button type="button" class="theme-btn active" data-theme="theme-red" title="Klasik TV Haber Kırmızı">
+                  <span class="theme-preview bg-theme-red"></span>
+                  <span>Klasik Kırmızı</span>
+                </button>
+                <button type="button" class="theme-btn" data-theme="theme-kick" title="Kick Neon Yeşil">
+                  <span class="theme-preview bg-theme-kick"></span>
+                  <span>Kick Neon</span>
+                </button>
+                <button type="button" class="theme-btn" data-theme="theme-cyber" title="Cyberpunk Mor/Cyan">
+                  <span class="theme-preview bg-theme-cyber"></span>
+                  <span>Siber Mor</span>
+                </button>
+                <button type="button" class="theme-btn" data-theme="theme-gold" title="VIP Altın Sarısı">
+                  <span class="theme-preview bg-theme-gold"></span>
+                  <span>Altın VIP</span>
+                </button>
+                <button type="button" class="theme-btn" data-theme="theme-dark" title="Gizli Operasyon Dark">
+                  <span class="theme-preview bg-theme-dark"></span>
+                  <span>Stealth Dark</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Checkboxes -->
+            <div class="setting-toggles-row">
+              <label class="checkbox-container">
+                <input type="checkbox" id="chk-clock" checked>
+                <span class="checkmark"></span>
+                <span>⏱️ Canlı Saati Göster</span>
+              </label>
+
+              <label class="checkbox-container">
+                <input type="checkbox" id="chk-sound" checked>
+                <span class="checkmark"></span>
+                <span>🔊 Güncellemede Haber Jingle'ı Çal</span>
+              </label>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    </main>
+
+    <!-- Toast Notification Popup -->
+    <div id="toast" class="toast">Haber bandı başarıyla güncellendi!</div>
+
+  </div>
+
+  <script src="admin.js"></script>
+</body>
+</html>

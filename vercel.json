@@ -1,0 +1,10 @@
+﻿{
+  "version": 2,
+  "cleanUrls": true,
+  "routes": [
+    { "src": "/overlay", "dest": "/overlay.html" },
+    { "src": "/control", "dest": "/index.html" },
+    { "src": "/admin", "dest": "/index.html" },
+    { "src": "/", "dest": "/index.html" }
+  ]
+}
