@@ -1,5 +1,5 @@
 ﻿// ============================================================================
-// 🔥 KNGL CONTROL PANEL - USERNAME AUTHENTICATION & FIREBASE SYNC
+// 🔥 KNGL CONTROL PANEL - USERNAME AUTH & REALTIME MODULES SYNC
 // ============================================================================
 (function() {
   // Auth Screen Elements
@@ -35,6 +35,8 @@
   const speedVal = document.getElementById('speed-val');
   const chkClock = document.getElementById('chk-clock');
   const chkSound = document.getElementById('chk-sound');
+  const chkWeather = document.getElementById('chk-weather');
+  const chkFinance = document.getElementById('chk-finance');
   const themeButtons = document.querySelectorAll('.theme-btn');
   const presetButtons = document.querySelectorAll('.preset-btn');
 
@@ -118,6 +120,8 @@
     }
     if (chkClock && state.showClock !== undefined) chkClock.checked = state.showClock;
     if (chkSound && state.soundEnabled !== undefined) chkSound.checked = state.soundEnabled;
+    if (chkWeather && state.showWeather !== undefined) chkWeather.checked = state.showWeather;
+    if (chkFinance && state.showFinance !== undefined) chkFinance.checked = state.showFinance;
     if (state.theme) {
       currentTheme = state.theme;
       themeButtons.forEach(btn => {
@@ -140,6 +144,8 @@
       visible: isCurrentlyVisible,
       showClock: chkClock ? chkClock.checked : true,
       soundEnabled: chkSound ? chkSound.checked : true,
+      showWeather: chkWeather ? chkWeather.checked : true,
+      showFinance: chkFinance ? chkFinance.checked : true,
       logoType: 'kangal',
       lastUpdateTimestamp: Date.now()
     };
@@ -197,7 +203,6 @@
       db = firebase.database();
       newsRef = db.ref('kngl_breaking_news');
 
-      // Auth State Listener
       auth.onAuthStateChanged(user => {
         if (user) {
           const username = user.email.split('@')[0];
@@ -243,7 +248,7 @@
     });
   }
 
-  // Handle Login Form Submit with Automatic '@kngl.com' append
+  // Handle Login Form Submit
   if (loginForm) {
     loginForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -257,7 +262,6 @@
         return;
       }
 
-      // Automatically append @kngl.com if user didn't type an email domain
       const formattedEmail = rawInput.includes('@') ? rawInput : `${rawInput}@kngl.com`;
 
       if (!auth) {
@@ -367,6 +371,20 @@
   if (chkSound) {
     chkSound.addEventListener('change', () => {
       if (newsRef) newsRef.update({ soundEnabled: chkSound.checked });
+    });
+  }
+
+  if (chkWeather) {
+    chkWeather.addEventListener('change', () => {
+      if (newsRef) newsRef.update({ showWeather: chkWeather.checked });
+      showToast(chkWeather.checked ? '☀️ Hava Durumu Modülü Açıldı' : '☀️ Hava Durumu Modülü Gizlendi');
+    });
+  }
+
+  if (chkFinance) {
+    chkFinance.addEventListener('change', () => {
+      if (newsRef) newsRef.update({ showFinance: chkFinance.checked });
+      showToast(chkFinance.checked ? '📈 Finans Modülü Açıldı' : '📈 Finans Modülü Gizlendi');
     });
   }
 
