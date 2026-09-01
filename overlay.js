@@ -1,5 +1,5 @@
 ﻿// ============================================================================
-// 🔥 OBS BREAKING NEWS OVERLAY - WITH 81 CITIES WEATHER & FINANCE MODULES
+// 🔥 OBS BREAKING NEWS OVERLAY - 81 CITIES (PLAKA SIRASI) & CANLI PİYASALAR
 // ============================================================================
 (function() {
   const state = {
@@ -18,7 +18,6 @@
   };
 
   const newsBarWrapper = document.getElementById('news-bar-wrapper');
-  const flashEffect = document.getElementById('flash-effect');
   const breakingBadgeText = document.getElementById('breaking-badge-text');
   const categoryText = document.getElementById('category-text');
   const clockDisplay = document.getElementById('clock-display');
@@ -41,94 +40,93 @@
   const financeIcon = document.getElementById('finance-icon');
 
   let lastAlertTimestamp = 0;
-  let lastUpdateTimestamp = 0;
   let isFirstLoad = true;
 
-  // ===================================================
-  // 1. TURKEY 81 CITIES OPEN-METEO WEATHER ENGINE
-  // ===================================================
-  const TURKISH_CITIES = [
-    { name: "ADANA", lat: 37.00, lon: 35.32, temp: 27, code: 0 },
-    { name: "ADIYAMAN", lat: 37.76, lon: 38.27, temp: 25, code: 0 },
-    { name: "AFYON", lat: 38.75, lon: 30.54, temp: 21, code: 1 },
-    { name: "AĞRI", lat: 39.72, lon: 43.05, temp: 18, code: 2 },
-    { name: "AMASYA", lat: 40.65, lon: 35.83, temp: 22, code: 1 },
-    { name: "ANKARA", lat: 39.93, lon: 32.85, temp: 22, code: 0 },
-    { name: "ANTALYA", lat: 36.88, lon: 30.70, temp: 29, code: 0 },
-    { name: "ARTVİN", lat: 41.18, lon: 41.82, temp: 20, code: 61 },
-    { name: "AYDIN", lat: 37.84, lon: 27.84, temp: 28, code: 0 },
-    { name: "BALIKESİR", lat: 39.65, lon: 27.88, temp: 23, code: 1 },
-    { name: "BİLECİK", lat: 40.14, lon: 29.98, temp: 21, code: 1 },
-    { name: "BİNGÖL", lat: 38.88, lon: 40.49, temp: 24, code: 0 },
-    { name: "BİTLİS", lat: 38.40, lon: 42.10, temp: 19, code: 2 },
-    { name: "BOLU", lat: 40.73, lon: 31.60, temp: 19, code: 1 },
-    { name: "BURDUR", lat: 37.72, lon: 30.29, temp: 23, code: 0 },
-    { name: "BURSA", lat: 40.18, lon: 29.06, temp: 24, code: 0 },
-    { name: "ÇANAKKALE", lat: 40.15, lon: 26.41, temp: 23, code: 1 },
-    { name: "ÇANKIRI", lat: 40.60, lon: 33.61, temp: 21, code: 0 },
-    { name: "ÇORUM", lat: 40.55, lon: 34.95, temp: 20, code: 1 },
-    { name: "DENİZLİ", lat: 37.77, lon: 29.08, temp: 27, code: 0 },
-    { name: "DİYARBAKIR", lat: 37.91, lon: 40.24, temp: 28, code: 0 },
-    { name: "EDİRNE", lat: 41.67, lon: 26.55, temp: 24, code: 1 },
-    { name: "ELAZIĞ", lat: 38.68, lon: 39.22, temp: 24, code: 0 },
-    { name: "ERZİNCAN", lat: 39.75, lon: 39.49, temp: 21, code: 1 },
-    { name: "ERZURUM", lat: 39.90, lon: 41.27, temp: 17, code: 2 },
-    { name: "ESKİŞEHİR", lat: 39.77, lon: 30.52, temp: 22, code: 0 },
-    { name: "GAZİANTEP", lat: 37.06, lon: 37.38, temp: 26, code: 0 },
-    { name: "GİRESUN", lat: 40.91, lon: 38.38, temp: 22, code: 61 },
-    { name: "GÜMÜŞHANE", lat: 40.46, lon: 39.47, temp: 19, code: 1 },
-    { name: "HAKKARİ", lat: 37.58, lon: 43.73, temp: 20, code: 0 },
-    { name: "HATAY", lat: 36.20, lon: 36.16, temp: 27, code: 0 },
-    { name: "ISPARTA", lat: 37.76, lon: 30.55, temp: 22, code: 0 },
-    { name: "MERSİN", lat: 36.80, lon: 34.63, temp: 28, code: 0 },
-    { name: "İSTANBUL", lat: 41.01, lon: 28.97, temp: 23, code: 0 },
-    { name: "İZMİR", lat: 38.42, lon: 27.14, temp: 28, code: 0 },
-    { name: "KARS", lat: 40.61, lon: 43.10, temp: 16, code: 2 },
-    { name: "KASTAMONU", lat: 41.38, lon: 33.78, temp: 19, code: 1 },
-    { name: "KAYSERİ", lat: 38.73, lon: 35.48, temp: 22, code: 0 },
-    { name: "KIRKLARELİ", lat: 41.73, lon: 27.22, temp: 23, code: 1 },
-    { name: "KIRŞEHİR", lat: 39.14, lon: 34.17, temp: 21, code: 0 },
-    { name: "KOCAELİ", lat: 40.76, lon: 29.92, temp: 23, code: 0 },
-    { name: "KONYA", lat: 37.87, lon: 32.48, temp: 23, code: 0 },
-    { name: "KÜTAHYA", lat: 39.42, lon: 29.98, temp: 20, code: 1 },
-    { name: "MALATYA", lat: 38.35, lon: 38.31, temp: 25, code: 0 },
-    { name: "MANİSA", lat: 38.61, lon: 27.42, temp: 28, code: 0 },
-    { name: "K.MARAŞ", lat: 37.58, lon: 36.93, temp: 26, code: 0 },
-    { name: "MARDİN", lat: 37.32, lon: 40.74, temp: 27, code: 0 },
-    { name: "MUĞLA", lat: 37.21, lon: 28.36, temp: 27, code: 0 },
-    { name: "MUŞ", lat: 38.74, lon: 41.49, temp: 20, code: 1 },
-    { name: "NEVŞEHİR", lat: 38.62, lon: 34.71, temp: 21, code: 0 },
-    { name: "NİĞDE", lat: 37.96, lon: 34.68, temp: 21, code: 0 },
-    { name: "ORDU", lat: 40.98, lon: 37.87, temp: 22, code: 61 },
-    { name: "RİZE", lat: 41.02, lon: 40.52, temp: 21, code: 61 },
-    { name: "SAKARYA", lat: 40.77, lon: 30.40, temp: 23, code: 0 },
-    { name: "SAMSUN", lat: 41.28, lon: 36.33, temp: 22, code: 1 },
-    { name: "SİİRT", lat: 37.93, lon: 41.94, temp: 26, code: 0 },
-    { name: "SİNOP", lat: 42.02, lon: 35.15, temp: 21, code: 1 },
-    { name: "SİVAS", lat: 39.75, lon: 37.01, temp: 19, code: 0 },
-    { name: "TEKİRDAĞ", lat: 40.98, lon: 27.51, temp: 23, code: 1 },
-    { name: "TOKAT", lat: 40.31, lon: 36.55, temp: 21, code: 1 },
-    { name: "TRABZON", lat: 41.00, lon: 39.72, temp: 22, code: 61 },
-    { name: "TUNCELİ", lat: 39.10, lon: 39.54, temp: 23, code: 0 },
-    { name: "ŞANLIURFA", lat: 37.16, lon: 38.79, temp: 29, code: 0 },
-    { name: "UŞAK", lat: 38.68, lon: 29.40, temp: 22, code: 0 },
-    { name: "VAN", lat: 38.49, lon: 43.38, temp: 18, code: 2 },
-    { name: "YOZGAT", lat: 39.81, lon: 34.80, temp: 19, code: 0 },
-    { name: "ZONGULDAK", lat: 41.45, lon: 31.79, temp: 21, code: 1 },
-    { name: "AKSARAY", lat: 38.36, lon: 34.03, temp: 22, code: 0 },
-    { name: "BAYBURT", lat: 40.25, lon: 40.22, temp: 18, code: 1 },
-    { name: "KARAMAN", lat: 37.17, lon: 33.22, temp: 22, code: 0 },
-    { name: "KIRIKKALE", lat: 39.84, lon: 33.51, temp: 22, code: 0 },
-    { name: "BATMAN", lat: 37.88, lon: 41.13, temp: 27, code: 0 },
-    { name: "ŞIRNAK", lat: 37.52, lon: 42.45, temp: 25, code: 0 },
-    { name: "BARTIN", lat: 41.63, lon: 32.33, temp: 21, code: 1 },
-    { name: "ARDAHAN", lat: 41.11, lon: 42.70, temp: 15, code: 2 },
-    { name: "IĞDIR", lat: 39.92, lon: 44.04, temp: 23, code: 0 },
-    { name: "YALOVA", lat: 40.65, lon: 29.27, temp: 23, code: 0 },
-    { name: "KARABÜK", lat: 41.20, lon: 32.62, temp: 21, code: 1 },
-    { name: "KİLİS", lat: 36.71, lon: 37.11, temp: 27, code: 0 },
-    { name: "OSMANİYE", lat: 37.07, lon: 36.24, temp: 27, code: 0 },
-    { name: "DÜZCE", lat: 40.84, lon: 31.16, temp: 22, code: 0 }
+  // ============================================================================
+  // 1. TÜRKİYE 81 İL RESMİ PLAKA SIRASI (01 ADANA -> 81 DÜZCE)
+  // ============================================================================
+  const TURKISH_CITIES_PLAKA = [
+    { plaka: "01", name: "ADANA", lat: 37.00, lon: 35.32, temp: 26, code: 0 },
+    { plaka: "02", name: "ADIYAMAN", lat: 37.76, lon: 38.27, temp: 25, code: 0 },
+    { plaka: "03", name: "AFYONKARAHİSAR", lat: 38.75, lon: 30.54, temp: 21, code: 1 },
+    { plaka: "04", name: "AĞRI", lat: 39.72, lon: 43.05, temp: 18, code: 2 },
+    { plaka: "05", name: "AMASYA", lat: 40.65, lon: 35.83, temp: 22, code: 1 },
+    { plaka: "06", name: "ANKARA", lat: 39.93, lon: 32.85, temp: 22, code: 0 },
+    { plaka: "07", name: "ANTALYA", lat: 36.88, lon: 30.70, temp: 29, code: 0 },
+    { plaka: "08", name: "ARTVİN", lat: 41.18, lon: 41.82, temp: 20, code: 61 },
+    { plaka: "09", name: "AYDIN", lat: 37.84, lon: 27.84, temp: 28, code: 0 },
+    { plaka: "10", name: "BALIKESİR", lat: 39.65, lon: 27.88, temp: 23, code: 1 },
+    { plaka: "11", name: "BİLECİK", lat: 40.14, lon: 29.98, temp: 21, code: 1 },
+    { plaka: "12", name: "BİNGÖL", lat: 38.88, lon: 40.49, temp: 24, code: 0 },
+    { plaka: "13", name: "BİTLİS", lat: 38.40, lon: 42.10, temp: 19, code: 2 },
+    { plaka: "14", name: "BOLU", lat: 40.73, lon: 31.60, temp: 19, code: 1 },
+    { plaka: "15", name: "BURDUR", lat: 37.72, lon: 30.29, temp: 23, code: 0 },
+    { plaka: "16", name: "BURSA", lat: 40.18, lon: 29.06, temp: 24, code: 0 },
+    { plaka: "17", name: "ÇANAKKALE", lat: 40.15, lon: 26.41, temp: 23, code: 1 },
+    { plaka: "18", name: "ÇANKIRI", lat: 40.60, lon: 33.61, temp: 21, code: 0 },
+    { plaka: "19", name: "ÇORUM", lat: 40.55, lon: 34.95, temp: 20, code: 1 },
+    { plaka: "20", name: "DENİZLİ", lat: 37.77, lon: 29.08, temp: 27, code: 0 },
+    { plaka: "21", name: "DİYARBAKIR", lat: 37.91, lon: 40.24, temp: 28, code: 0 },
+    { plaka: "22", name: "EDİRNE", lat: 41.67, lon: 26.55, temp: 24, code: 1 },
+    { plaka: "23", name: "ELAZIĞ", lat: 38.68, lon: 39.22, temp: 24, code: 0 },
+    { plaka: "24", name: "ERZİNCAN", lat: 39.75, lon: 39.49, temp: 21, code: 1 },
+    { plaka: "25", name: "ERZURUM", lat: 39.90, lon: 41.27, temp: 17, code: 2 },
+    { plaka: "26", name: "ESKİŞEHİR", lat: 39.77, lon: 30.52, temp: 22, code: 0 },
+    { plaka: "27", name: "GAZİANTEP", lat: 37.06, lon: 37.38, temp: 26, code: 0 },
+    { plaka: "28", name: "GİRESUN", lat: 40.91, lon: 38.38, temp: 22, code: 61 },
+    { plaka: "29", name: "GÜMÜŞHANE", lat: 40.46, lon: 39.47, temp: 19, code: 1 },
+    { plaka: "30", name: "HAKKARİ", lat: 37.58, lon: 43.73, temp: 20, code: 0 },
+    { plaka: "31", name: "HATAY", lat: 36.20, lon: 36.16, temp: 27, code: 0 },
+    { plaka: "32", name: "ISPARTA", lat: 37.76, lon: 30.55, temp: 22, code: 0 },
+    { plaka: "33", name: "MERSİN", lat: 36.80, lon: 34.63, temp: 28, code: 0 },
+    { plaka: "34", name: "İSTANBUL", lat: 41.01, lon: 28.97, temp: 23, code: 0 },
+    { plaka: "35", name: "İZMİR", lat: 38.42, lon: 27.14, temp: 28, code: 0 },
+    { plaka: "36", name: "KARS", lat: 40.61, lon: 43.10, temp: 16, code: 2 },
+    { plaka: "37", name: "KASTAMONU", lat: 41.38, lon: 33.78, temp: 19, code: 1 },
+    { plaka: "38", name: "KAYSERİ", lat: 38.73, lon: 35.48, temp: 22, code: 0 },
+    { plaka: "39", name: "KIRKLARELİ", lat: 41.73, lon: 27.22, temp: 23, code: 1 },
+    { plaka: "40", name: "KIRŞEHİR", lat: 39.14, lon: 34.17, temp: 21, code: 0 },
+    { plaka: "41", name: "KOCAELİ", lat: 40.76, lon: 29.92, temp: 23, code: 0 },
+    { plaka: "42", name: "KONYA", lat: 37.87, lon: 32.48, temp: 23, code: 0 },
+    { plaka: "43", name: "KÜTAHYA", lat: 39.42, lon: 29.98, temp: 20, code: 1 },
+    { plaka: "44", name: "MALATYA", lat: 38.35, lon: 38.31, temp: 25, code: 0 },
+    { plaka: "45", name: "MANİSA", lat: 38.61, lon: 27.42, temp: 28, code: 0 },
+    { plaka: "46", name: "KAHRAMANMARAŞ", lat: 37.58, lon: 36.93, temp: 26, code: 0 },
+    { plaka: "47", name: "MARDİN", lat: 37.32, lon: 40.74, temp: 27, code: 0 },
+    { plaka: "48", name: "MUĞLA", lat: 37.21, lon: 28.36, temp: 27, code: 0 },
+    { plaka: "49", name: "MUŞ", lat: 38.74, lon: 41.49, temp: 20, code: 1 },
+    { plaka: "50", name: "NEVŞEHİR", lat: 38.62, lon: 34.71, temp: 21, code: 0 },
+    { plaka: "51", name: "NİĞDE", lat: 37.96, lon: 34.68, temp: 21, code: 0 },
+    { plaka: "52", name: "ORDU", lat: 40.98, lon: 37.87, temp: 22, code: 61 },
+    { plaka: "53", name: "RİZE", lat: 41.02, lon: 40.52, temp: 21, code: 61 },
+    { plaka: "54", name: "SAKARYA", lat: 40.77, lon: 30.40, temp: 23, code: 0 },
+    { plaka: "55", name: "SAMSUN", lat: 41.28, lon: 36.33, temp: 22, code: 1 },
+    { plaka: "56", name: "SİİRT", lat: 37.93, lon: 41.94, temp: 26, code: 0 },
+    { plaka: "57", name: "SİNOP", lat: 42.02, lon: 35.15, temp: 21, code: 1 },
+    { plaka: "58", name: "SİVAS", lat: 39.75, lon: 37.01, temp: 19, code: 0 },
+    { plaka: "59", name: "TEKİRDAĞ", lat: 40.98, lon: 27.51, temp: 23, code: 1 },
+    { plaka: "60", name: "TOKAT", lat: 40.31, lon: 36.55, temp: 21, code: 1 },
+    { plaka: "61", name: "TRABZON", lat: 41.00, lon: 39.72, temp: 22, code: 61 },
+    { plaka: "62", name: "TUNCELİ", lat: 39.10, lon: 39.54, temp: 23, code: 0 },
+    { plaka: "63", name: "ŞANLIURFA", lat: 37.16, lon: 38.79, temp: 29, code: 0 },
+    { plaka: "64", name: "UŞAK", lat: 38.68, lon: 29.40, temp: 22, code: 0 },
+    { plaka: "65", name: "VAN", lat: 38.49, lon: 43.38, temp: 18, code: 2 },
+    { plaka: "66", name: "YOZGAT", lat: 39.81, lon: 34.80, temp: 19, code: 0 },
+    { plaka: "67", name: "ZONGULDAK", lat: 41.45, lon: 31.79, temp: 21, code: 1 },
+    { plaka: "68", name: "AKSARAY", lat: 38.36, lon: 34.03, temp: 22, code: 0 },
+    { plaka: "69", name: "BAYBURT", lat: 40.25, lon: 40.22, temp: 18, code: 1 },
+    { plaka: "70", name: "KARAMAN", lat: 37.17, lon: 33.22, temp: 22, code: 0 },
+    { plaka: "71", name: "KIRIKKALE", lat: 39.84, lon: 33.51, temp: 22, code: 0 },
+    { plaka: "72", name: "BATMAN", lat: 37.88, lon: 41.13, temp: 27, code: 0 },
+    { plaka: "73", name: "ŞIRNAK", lat: 37.52, lon: 42.45, temp: 25, code: 0 },
+    { plaka: "74", name: "BARTIN", lat: 41.63, lon: 32.33, temp: 21, code: 1 },
+    { plaka: "75", name: "ARDAHAN", lat: 41.11, lon: 42.70, temp: 15, code: 2 },
+    { plaka: "76", name: "IĞDIR", lat: 39.92, lon: 44.04, temp: 23, code: 0 },
+    { plaka: "77", name: "YALOVA", lat: 40.65, lon: 29.27, temp: 23, code: 0 },
+    { plaka: "78", name: "KARABÜK", lat: 41.20, lon: 32.62, temp: 21, code: 1 },
+    { plaka: "79", name: "KİLİS", lat: 36.71, lon: 37.11, temp: 27, code: 0 },
+    { plaka: "80", name: "OSMANİYE", lat: 37.07, lon: 36.24, temp: 27, code: 0 },
+    { plaka: "81", name: "DÜZCE", lat: 40.84, lon: 31.16, temp: 22, code: 0 }
   ];
 
   function getWeatherEmoji(code) {
@@ -144,10 +142,10 @@
     return '⛅';
   }
 
-  // Fetch real Open-Meteo multi-location weather in a single batch
+  // Fetch Open-Meteo 81 Provinces Data in Batch
   function fetchLiveWeatherData() {
-    const lats = TURKISH_CITIES.map(c => c.lat).join(',');
-    const lons = TURKISH_CITIES.map(c => c.lon).join(',');
+    const lats = TURKISH_CITIES_PLAKA.map(c => c.lat).join(',');
+    const lons = TURKISH_CITIES_PLAKA.map(c => c.lon).join(',');
     const url = `https://api.open-meteo.com/v1/forecast?latitude=${lats}&longitude=${lons}&current_weather=true`;
 
     fetch(url)
@@ -155,28 +153,27 @@
       .then(data => {
         if (Array.isArray(data)) {
           data.forEach((item, index) => {
-            if (item && item.current_weather && TURKISH_CITIES[index]) {
-              TURKISH_CITIES[index].temp = Math.round(item.current_weather.temperature);
-              TURKISH_CITIES[index].code = item.current_weather.weathercode;
+            if (item && item.current_weather && TURKISH_CITIES_PLAKA[index]) {
+              TURKISH_CITIES_PLAKA[index].temp = Math.round(item.current_weather.temperature);
+              TURKISH_CITIES_PLAKA[index].code = item.current_weather.weathercode;
             }
           });
-          console.log('✅ [Weather] 81 İl Hava Durumu Güncellendi.');
+          console.log('✅ [Weather] 81 İl Hava Durumu Güncellendi (30dk Zamanlayıcı).');
         }
       })
       .catch(err => {
-        console.warn('Weather API failed, using cached values:', err);
+        console.warn('Weather API fetch failed, keeping active dataset:', err);
       });
   }
 
-  // Weather Carousel Loop (3 Seconds Interval)
+  // Weather Carousel Loop (3 Seconds Interval - Plaka Sırasına Göre)
   let currentWeatherIndex = 0;
   function rotateWeather() {
     if (!state.showWeather || !weatherCarouselSlot) return;
 
-    const cityData = TURKISH_CITIES[currentWeatherIndex];
-    currentWeatherIndex = (currentWeatherIndex + 1) % TURKISH_CITIES.length;
+    const cityData = TURKISH_CITIES_PLAKA[currentWeatherIndex];
+    currentWeatherIndex = (currentWeatherIndex + 1) % TURKISH_CITIES_PLAKA.length;
 
-    // Slide out animation
     weatherCarouselSlot.classList.add('slide-out');
 
     setTimeout(() => {
@@ -193,9 +190,9 @@
     }, 350);
   }
 
-  // ===================================================
-  // 2. FINANCE & MARKETS ROTATOR ENGINE
-  // ===================================================
+  // ============================================================================
+  // 2. FINANS & CANLI PİYASALAR ROTATOR ENGINE
+  // ============================================================================
   const FINANCE_ITEMS = [
     { name: "USD/TRY", val: "34.12 ₺", icon: "📈" },
     { name: "EUR/TRY", val: "37.85 ₺", icon: "📈" },
@@ -219,7 +216,7 @@
           FINANCE_ITEMS[0].val = usdTry.toFixed(2) + " ₺";
           FINANCE_ITEMS[1].val = eurTry.toFixed(2) + " ₺";
           FINANCE_ITEMS[5].val = gbpTry.toFixed(2) + " ₺";
-          console.log('✅ [Finance] Döviz kurları güncellendi.');
+          console.log('✅ [Finance] Döviz kurları güncellendi (5dk Zamanlayıcı).');
         }
       })
       .catch(err => {
@@ -234,7 +231,6 @@
     const item = FINANCE_ITEMS[currentFinanceIndex];
     currentFinanceIndex = (currentFinanceIndex + 1) % FINANCE_ITEMS.length;
 
-    // Slide out animation
     financeCarouselSlot.classList.add('slide-out');
 
     setTimeout(() => {
@@ -251,18 +247,26 @@
     }, 350);
   }
 
-  // Start 3-second carousels
+  // ============================================================================
+  // 3. ZAMANLAYICILAR & OTOMATİK YENİLEME
+  // ============================================================================
+  // Arayüz Döngüleri (3 Saniye)
   setInterval(rotateWeather, 3000);
   setInterval(rotateFinance, 3000);
+
+  // İlk yükleme
   fetchLiveWeatherData();
   fetchLiveFinanceData();
-  // Refresh weather every 15 minutes, finance every 60 seconds
-  setInterval(fetchLiveWeatherData, 15 * 60 * 1000);
-  setInterval(fetchLiveFinanceData, 60 * 1000);
 
-  // ===================================================
-  // 3. AUDIO ALERT SYNTHESIZER
-  // ===================================================
+  // Otomatik Arka Plan Yenileme:
+  // - Finans / Borsa verileri: Her 5 dakikada bir (5 * 60 * 1000 ms)
+  setInterval(fetchLiveFinanceData, 5 * 60 * 1000);
+  // - Hava Durumu verileri: Her 30 dakikada bir (30 * 60 * 1000 ms)
+  setInterval(fetchLiveWeatherData, 30 * 60 * 1000);
+
+  // ============================================================================
+  // 4. SESLİ UYARI JINGLE (FLAŞSIZ, SADECE SES)
+  // ============================================================================
   let audioCtx = null;
   function playBreakingNewsSound() {
     if (!state.soundEnabled) return;
@@ -298,17 +302,9 @@
     }
   }
 
-  function triggerVisualAndAudioAlert() {
-    if (!flashEffect) return;
-    flashEffect.classList.remove('active');
-    void flashEffect.offsetWidth;
-    flashEffect.classList.add('active');
-    playBreakingNewsSound();
-  }
-
-  // ===================================================
-  // 4. SMOOTH MARQUEE ENGINE (CONTAINED IN VIEWPORT)
-  // ===================================================
+  // ============================================================================
+  // 5. SMOOTH MARQUEE ENGINE (SIFIR PARLAMA / SIFIR FLAŞ)
+  // ============================================================================
   let animationFrameId = null;
   let currentOffset = 0;
   let lastFrameTime = performance.now();
@@ -372,9 +368,9 @@
     animationFrameId = requestAnimationFrame(step);
   }
 
-  // ===================================================
-  // 5. APPLY STATE (FIREBASE SYNC)
-  // ===================================================
+  // ============================================================================
+  // 6. APPLY STATE (FIREBASE SYNC - FLAŞSIZ PÜRÜZSÜZ GEÇİŞ)
+  // ============================================================================
   function applyState(newState) {
     if (!newState) return;
     const prevText = state.tickerText;
@@ -426,23 +422,19 @@
 
     document.body.className = state.theme || 'theme-red';
 
-    // Rebuild Ticker if text or layout changed
+    // Rebuild Ticker if text or layout changed (completely smooth, no screen flash)
     if (prevText !== state.tickerText || prevWeather !== state.showWeather || prevFinance !== state.showFinance || isFirstLoad) {
       setupTicker();
     }
 
-    // Alert check
+    // Only play sound chime if explicitly triggered via alert button, no screen flash
     if (!isFirstLoad) {
       if (newState.alertTimestamp && newState.alertTimestamp !== lastAlertTimestamp) {
         lastAlertTimestamp = newState.alertTimestamp;
-        triggerVisualAndAudioAlert();
-      } else if (newState.lastUpdateTimestamp && newState.lastUpdateTimestamp !== lastUpdateTimestamp && prevText !== state.tickerText) {
-        lastUpdateTimestamp = newState.lastUpdateTimestamp;
-        triggerVisualAndAudioAlert();
+        playBreakingNewsSound();
       }
     } else {
       if (newState.alertTimestamp) lastAlertTimestamp = newState.alertTimestamp;
-      if (newState.lastUpdateTimestamp) lastUpdateTimestamp = newState.lastUpdateTimestamp;
       isFirstLoad = false;
     }
   }
@@ -463,9 +455,9 @@
     setupTicker();
   });
 
-  // ===================================================
-  // 🔥 FIREBASE REALTIME LISTENER
-  // ===================================================
+  // ============================================================================
+  // 7. FIREBASE REALTIME LISTENER
+  // ============================================================================
   function initFirebaseOverlay() {
     const cfg = window.FIREBASE_CONFIG;
     
