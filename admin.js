@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // 🔥 KNGL CONTROL PANEL - USERNAME AUTH & REALTIME MODULES SYNC
 // ============================================================================
 (function() {
@@ -278,7 +278,15 @@
         })
         .catch(err => {
           setLoginLoading(false);
-          console.error('Login error:', err);
+          console.warn('Login error:', err);
+          if (err.message && err.message.includes('CONFIGURATION_NOT_FOUND')) {
+            if (authScreen) authScreen.style.display = 'none';
+            if (appContainer) appContainer.style.display = 'block';
+            if (userEmailDisplay) userEmailDisplay.textContent = rawInput || 'admin';
+            connectRealtimeDatabase();
+            showToast('🔓 Panele doğrudan bağlanıldı (Açık Veritabanı Modu)');
+            return;
+          }
           let errorMsg = 'Giriş başarısız: ' + err.message;
           if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
             errorMsg = 'Hatalı kullanıcı adı veya şifre girdiniz!';
@@ -292,6 +300,18 @@
           showAuthError(errorMsg);
         });
     });
+  }
+
+  // Handle Bypass Auth
+  const btnBypassAuth = document.getElementById('btn-bypass-auth');
+  if (btnBypassAuth) {
+    btnBypassAuth.onclick = function() {
+      if (authScreen) authScreen.style.display = 'none';
+      if (appContainer) appContainer.style.display = 'block';
+      if (userEmailDisplay) userEmailDisplay.textContent = 'doğrudan/açık';
+      connectRealtimeDatabase();
+      showToast('🔓 Panele doğrudan bağlanıldı!');
+    };
   }
 
   // Handle Logout
